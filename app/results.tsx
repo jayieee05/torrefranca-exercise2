@@ -5,7 +5,7 @@ import { BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { questions } from '@/data/questions';
+import { useQuiz } from '@/contexts/QuizContext';
 
 const HIGHEST_SCORE_KEY = '@quiz_highest_score';
 
@@ -13,41 +13,42 @@ export default function ResultsScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const params = useLocalSearchParams();
+  const { questions } = useQuiz();
   const currentScore = parseInt(params.currentScore as string, 10) || 0;
   const [highestScore, setHighestScore] = useState(0);
   const totalQuestions = questions.length;
-  const percentage = Math.round((currentScore / totalQuestions) * 100);
+  const percentage = totalQuestions > 0 ? Math.round((currentScore / totalQuestions) * 100) : 0;
   const isNewRecord = currentScore === highestScore && currentScore > 0;
 
-  // Load highest score from storage and ensure it's up to date
+  // I load the highest score from storage and make sure it's up to date
   useEffect(() => {
     const loadHighestScore = async () => {
       try {
         const storedHighest = await AsyncStorage.getItem(HIGHEST_SCORE_KEY);
         const stored = storedHighest ? parseInt(storedHighest, 10) : 0;
-        // Use the maximum of stored score and current score to handle any edge cases
+        // I use the maximum to handle any edge cases where storage might be out of sync
         const actualHighest = Math.max(stored, currentScore);
         setHighestScore(actualHighest);
         
-        // Update storage if current score is higher
+        // If the current score is higher, I update the storage
         if (currentScore > stored) {
           await AsyncStorage.setItem(HIGHEST_SCORE_KEY, currentScore.toString());
         }
       } catch (error) {
         console.error('Error loading highest score:', error);
-        // Fallback to current score if there's an error
+        // If there's an error, I just use the current score as fallback
         setHighestScore(currentScore);
       }
     };
     loadHighestScore();
   }, [currentScore]);
 
-  // Handle back button to navigate to home
+  // I handle the back button to go back to home
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
         router.push('/');
-        return true; // Prevent default back behavior
+        return true; // I prevent the default back behavior
       };
 
       const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
@@ -56,12 +57,12 @@ export default function ResultsScreen() {
     }, [router])
   );
 
-  // Handle header back button
+  // I also handle the header back button the same way
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-      // Prevent default behavior
+      // I prevent the default navigation
       e.preventDefault();
-      // Navigate to home
+      // And navigate to home instead
       router.push('/');
     });
 

@@ -3,33 +3,36 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import { QuizProvider } from '@/contexts/QuizContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen 
-          name="quiz" 
-          options={{ 
-            title: 'Quiz', 
-            headerShown: true,
-            headerBackTitle: 'Home',
-          }} 
-        />
-        <Stack.Screen 
-          name="results" 
-          options={{ 
-            title: 'Results', 
-            headerShown: true,
-            headerBackTitle: 'Home',
-          }} 
-        />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <QuizProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen 
+            name="quiz" 
+            options={{ 
+              title: 'Quiz', 
+              headerShown: true,
+              headerBackTitle: 'Home',
+            }} 
+          />
+          <Stack.Screen 
+            name="results" 
+            options={{ 
+              title: 'Results', 
+              headerShown: true,
+              headerBackTitle: 'Home',
+            }} 
+          />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </QuizProvider>
   );
 }
